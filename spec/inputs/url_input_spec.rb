@@ -1,5 +1,8 @@
 # encoding: utf-8
 require 'spec_helper'
+  
+def posts_path(*args); "/posts"; end
+def post_path(*args); "/posts/1"; end
 
 describe 'url input' do
 
@@ -7,11 +10,15 @@ describe 'url input' do
 
   before do
     @output_buffer = ''
-    mock_everything
+    @new_post = mock('post').as_null_object
+    @new_post.stub!(:class).and_return(::Post)
   end
 
   describe "when object is provided" do
     before do
+      @new_post.stub!(:url)
+      @new_post.stub!(:column_for_attribute).with(:title).and_return(mock('column', :type => :string, :limit => 50))
+      @new_post.stub!(:column_for_attribute).with(:url).and_return(mock('column', :type => :string, :limit => 255))
       concat(semantic_form_for(@new_post) do |builder|
         concat(builder.input(:url))
       end)
